@@ -1,5 +1,17 @@
 $main-color: skyblue;
 
 body {
-  background-color: $main-color;
+  background-color: #fff;
+}
+.board {
+  &__row {
+    display: flex;
+  }
+  &__col {
+    $col-width: 50px;
+    width: $col-width;
+    height: $col-width;
+    background-color: green;
+    margin: 5px;
+  }
 }
