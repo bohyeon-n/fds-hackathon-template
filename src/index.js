@@ -1,65 +1,100 @@
-
 class TicTacToe {
-  // 상태? 
+  init() {
+    this.board = [[null, null, null], [null, null, null], [null, null, null]];
+    this.player = "X";
+  }
+  // 상태?
   // - 게임판
   board = [
-    [null, null, null],
-    [null, null, null],
-    [null, null, null]
-  ]
-  // - 현재 플레이어 
-  player = 'X'
-  // 동작? 
-  
+    [null, null, null], 
+    [null, null, null], 
+    [null, null, null]];
+  // - 현재 플레이어
+  player = "X";
+  // 동작?
   // - 턴
-  turn({row, col}) {
+  turn({ row, col }) {
     // 현재 플레이어에 대한 표시를 게임판의 해당 위치에 넣어주고
-    this.board[row][col] = this.player;
-    // 현재 플레이어를 변경 
-    this.player = this.player === 'X' ? 'O' : 'X';
+    if(this.board[row][col] === null) {
+      this.board[row][col] = this.player;
+      // 현재 플레이어를 변경
+      this.player = this.player === "X" ? "O" : "X";
+    }
   }
-  // - 누가 이겼는지 판결 
+  // - 누가 이겼는지 판별
   checkWinner() {
-    for(let i = 0; i <3; i++){
-      if(this.board[i][0] !== null && 
-     this.board[i][0] === this.board[i][1] && this.board[i][1] === this.board[i][2] ) {
+    if (
+      this.board[0][0] != null &&
+      this.board[0][0] === this.board[1][1] &&
+      this.board[1][1] === this.board[2][2]
+    ) {
+      return this.board[0][0];
+    }
+    if (
+      this.board[0][2] != null &&
+      this.board[0][2] === this.board[1][1] &&
+      this.board[1][1] === this.board[2][0]
+    ) {
+      return this.board[0][2];
+    }
+    for (let i = 0; i < 3; i++) {
+      if (
+        this.board[i][0] != null &&
+        this.board[i][0] === this.board[i][1] &&
+        this.board[i][1] === this.board[i][2]
+      ) {
         return this.board[i][0];
+      } else if (
+        this.board[0][i] != null &&
+        this.board[0][i] === this.board[1][i] &&
+        this.board[1][i] === this.board[2][i]
+      ) {
+        return this.board[0][i];
+      } else if(
+        this.isDraw() 
+      ) {
+        return 'the game ended in a tie!'
       }
     }
   }
-  // 로직에 dom api 를 갖다 붙이는 식으로 코딩을 해라.
-  // 나중에 어떻게 갖다 붙일 것 인지는 미리 생각해야됨
-  // 거기에 대한 메소드를 미리 만들어놓아야 함 
-  
-}
-
-const game = new TicTacToe();
-
-const rowEls = document.querySelectorAll('.board__row');
-rowEls.forEach((rowEl, rowIndex) => {
-  const colEls = rowEl.querySelectorAll('.board__col')
-  colEls.forEach((colEl, colIndex) => {
-    colEl.addEventListener('click', e => {
-      game.turn({row: rowIndex, col: colIndex});
-      draw();
-    })
-  })
-})
-
-function draw() {
-  game.board.forEach((rowArr, rowIndex) => {
-    const rowEl = rowEls[rowIndex];
-    const colEls = rowEl.querySelectorAll('.board__col')
-    rowArr.forEach((col, colIndex) => {
-      colEls[colIndex].textContent = col;
-    })
-  })
-  const winner = game.checkWinner();
-  if(winner) {
-    document.querySelector('.winner').textContent = winner;
+  isDraw() {
+    notNull = 0;
+    for (let i = 0; i < 3; i++){
+      for(let j = 0; j < 3; j++){
+        if(this.board[i][j] != null){
+          notNull++
+        }
+      }
+    }
+    if(notNull === 9){
+      return true
+    }
   }
 }
-
-// 로직
-// html css 
-// dom api 
+const game = new TicTacToe();
+const rowEls = document.querySelectorAll(".board__row");
+const modalEl = document.querySelector('.modal');
+const txtEl = document.querySelector('.winner-txt');
+rowEls.forEach((rowEl, rowIndex) => {
+  const colEls = rowEl.querySelectorAll(".board__col");
+  colEls.forEach((colEl, colIndex) => {
+    colEl.addEventListener("click", e => {
+      game.turn({ row: rowIndex, col: colIndex });
+      e.target.textContent = game.board[rowIndex][colIndex];
+      const message = game.checkWinner();
+      if (message) {
+        txtEl.textContent = message;
+        modalEl.classList.add('end');
+      }  
+    });
+  });
+});
+const btnEl = document.querySelector(".restart-btn");
+btnEl.addEventListener("click", e => {
+  game.init();
+  document.querySelectorAll(".board__col").forEach(col => {
+    col.textContent = "";
+  });
+  modalEl.classList.remove("end");
+  txtEl.textContent ='';
+});
